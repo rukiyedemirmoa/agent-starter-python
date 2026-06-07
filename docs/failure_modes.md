@@ -2,23 +2,28 @@
 
 **Stage 3 — Operationalize *failure* as UX.**
 
-Agents fail in ways normal programs don't: they make things up, misread intent, call
-the wrong tool, or cost money/time. Decide *now* what failure looks like and how the
-agent should fail **gracefully** instead of confidently-wrong.
+The risky moments here are: the model inventing a real famous band, the wrong number of
+songs, and spending fal.ai money the user didn't want.
 
 ## For each likely failure
 
 | What could go wrong | How likely / how bad | How the agent should handle it |
 |---------------------|----------------------|--------------------------------|
-| e.g. the model invents a fact | medium / bad | cite sources; say "I'm not sure" when unsupported |
-| e.g. the user's input is vague | high / mild | ask one clarifying question |
-| e.g. an external API is down | low / bad | catch the error, tell the user plainly, log it |
+| Vibe is vague/empty (`""`, `music`) | high / mild | still produce a concrete concept; don't crash or stall asking questions |
+| Model returns ≠10 songs | medium / mild | enforce exactly 10 via a Pydantic validator; model retries to satisfy it |
+| Band name is a real famous band (Nirvana, Radiohead) | medium / bad | system prompt forbids known acts; ask for an *original* name |
+| Cover generated without consent → wasted spend | medium / bad | **hard gate**: never call fal until the user explicitly confirms |
+| fal.ai is down / slow / errors | low / mild | catch it, print a plain message, keep the name + tracklist already shown |
+| Cover URL is temporary | certain if not handled | `persist=True` → re-upload to R2 so the link is durable |
 
 ## Hard rules (things the agent must never do)
 
-- _(e.g. never delete data without confirmation)_
-- _(e.g. never claim certainty it doesn't have)_
+- **Never call fal.ai (spend money) before the user confirms the cover.**
+- Never return a real, well-known band's name as the invented one.
+- Never return more or fewer than 10 songs.
+- Never crash on weird input — degrade to a reasonable concept instead.
 
 ## What the user should see when things go wrong
 
-_(A friendly, honest message beats a stack trace or a confident lie.)_
+A plain, honest line — "Couldn't reach the image service, but here's your band and
+tracklist" — never a stack trace, and never a silent half-result.
