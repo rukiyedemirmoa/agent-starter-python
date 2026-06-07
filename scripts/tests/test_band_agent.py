@@ -7,20 +7,19 @@
   uv run pytest -m integration scripts/tests/test_band_agent.py  # live
 """
 
-import os
-
 import pytest
 from pydantic import ValidationError
 
-# Fake key so get_settings() / agent construction is happy. No API call in unit tests.
-os.environ.setdefault("OPENROUTER_API_KEY", "test-key-not-real")
+# NOTE: unlike the smoke test, we do NOT set a fake key here — a fake env var would
+# override the real one in .env and make the integration test below silently skip.
+# Agent construction in the unit tests relies on the real key being present in .env.
 
 
 def _llm_ready() -> bool:
     from agent.config import get_settings
 
     try:
-        return get_settings().openrouter_api_key != "test-key-not-real"
+        return bool(get_settings().openrouter_api_key)
     except Exception:
         return False
 
