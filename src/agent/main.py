@@ -53,13 +53,15 @@ async def _run() -> None:
 
     console.print("[dim]Generating cover…[/]")
     try:
-        url = await generate_cover(concept, vibe)
+        cover = await generate_cover(concept, vibe)
     except Exception as error:  # fal down/slow/empty — fail honestly, keep the concept
         logger.error("Cover generation failed: {}", error)
         console.print(f"[red]Couldn't generate the cover:[/] {error}")
         console.print("[dim]Your band and tracklist above still stand.[/]")
         return
-    console.print(f"🖼  [bold]Album cover:[/] {url}")
+    console.print(f"🖼  [bold]Album cover:[/] {cover.url}")
+    if not cover.persisted:
+        console.print("[yellow]Note: this is a temporary link (expires ~1h) — R2 save failed.[/]")
 
 
 def main() -> None:

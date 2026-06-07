@@ -14,7 +14,8 @@ songs, and spending fal.ai money the user didn't want.
 | Band name is a real famous band (Nirvana, Radiohead) | medium / bad | system prompt forbids known acts; ask for an *original* name |
 | Cover generated without consent → wasted spend | medium / bad | **hard gate**: never call fal until the user explicitly confirms |
 | fal.ai is down / slow / errors | low / mild | catch it, print a plain message, keep the name + tracklist already shown |
-| Cover URL is temporary | certain if not handled | `persist=True` → re-upload to R2 so the link is durable |
+| Cover URL is temporary | certain if not handled | persist to R2 → durable link |
+| R2 upload fails (misconfigured/down) | low / mild | keep the generated image: fall back to fal's *temporary* URL and warn it expires |
 
 ## Hard rules (things the agent must never do)
 

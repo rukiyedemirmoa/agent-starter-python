@@ -56,18 +56,63 @@ def test_tracklist_must_be_exactly_ten(n: int) -> None:
         )
 
 
-def test_cover_prompt_includes_name_and_style() -> None:
-    from agent.agents.band import TRACK_COUNT, BandConcept, _cover_prompt
+def _fake_concept() -> "object":
+    from agent.agents.band import TRACK_COUNT, BandConcept
 
-    concept = BandConcept(
+    return BandConcept(
         band_name="Hollow Meridian",
         tracklist=[f"Track {i}" for i in range(TRACK_COUNT)],
         style_note="Rain-slicked neon over an empty freeway.",
     )
-    prompt = _cover_prompt(concept, "rainy 3am synthwave")
+
+
+def test_cover_prompt_includes_name_and_style() -> None:
+    from agent.agents.band import _cover_prompt
+
+    prompt = _cover_prompt(_fake_concept(), "rainy 3am synthwave")  # type: ignore[arg-type]
     assert "Hollow Meridian" in prompt
     assert "Rain-slicked neon" in prompt
     assert "rainy 3am synthwave" in prompt
+
+
+async def test_cover_persists_when_r2_ok(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Happy path: a successful R2 persist yields a durable URL (persisted=True)."""
+    from agent.agents import band
+    from agent.services.media import MediaFile, MediaResult
+
+    async def fake_t2i(prompt: str, **kw: object) -> MediaResult:
+        return MediaResult(files=[MediaFile(url="https://fal.temp/img.png")])
+
+    async def fake_persist(file: MediaFile, *, prefix: str = "") -> MediaFile:
+        return MediaFile(url="https://r2.durable/img.png", stored_key=f"{prefix}/x.png")
+
+    monkeypatch.setattr(band.media, "text_to_image", fake_t2i)
+    monkeypatch.setattr(band.media, "persist_file", fake_persist)
+
+    cover = await band.generate_cover(_fake_concept(), "vibe")  # type: ignore[arg-type]
+    assert cover.persisted is True
+    assert cover.url == "https://r2.durable/img.png"
+
+
+async def test_cover_falls_back_to_temp_url_when_r2_fails(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """If R2 persist raises, we keep the generated image via fal's temporary URL."""
+    from agent.agents import band
+    from agent.services.media import MediaFile, MediaResult
+
+    async def fake_t2i(prompt: str, **kw: object) -> MediaResult:
+        return MediaResult(files=[MediaFile(url="https://fal.temp/img.png")])
+
+    async def boom(file: MediaFile, *, prefix: str = "") -> MediaFile:
+        raise RuntimeError("SignatureDoesNotMatch")
+
+    monkeypatch.setattr(band.media, "text_to_image", fake_t2i)
+    monkeypatch.setattr(band.media, "persist_file", boom)
+
+    cover = await band.generate_cover(_fake_concept(), "vibe")  # type: ignore[arg-type]
+    assert cover.persisted is False
+    assert cover.url == "https://fal.temp/img.png"  # the image is not lost
 
 
 # --- integration: a real concept from a real vibe ---------------------------

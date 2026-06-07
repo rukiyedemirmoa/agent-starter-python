@@ -120,6 +120,15 @@ async def _persist(file: MediaFile, prefix: str) -> MediaFile:
     return MediaFile(url=url, content_type=file.content_type, stored_key=key)
 
 
+async def persist_file(file: MediaFile, *, prefix: str = "") -> MediaFile:
+    """Copy an already-generated file into R2 and return durable info.
+
+    Use this when you generate without `persist=True` and want to persist
+    *conditionally* — e.g. fall back to the temporary fal URL if R2 is unavailable.
+    """
+    return await _persist(file, prefix)
+
+
 async def generate(
     model: str,
     inputs: dict[str, Any],

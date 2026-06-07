@@ -20,9 +20,10 @@ say-so — an album cover.
    - No / Enter → print nothing more, spend nothing, exit cleanly.
    - Yes → continue.
 5. Build an image prompt from the band name + vibe + style note.
-6. Call `media.text_to_image(..., persist=True, prefix="bandnamer")`.
-7. Print the durable cover URL. On failure, print a plain message; the name + tracklist
-   already shown stay intact.
+6. Generate the image (fal), then persist it to R2 for a durable link. If the R2 upload
+   fails, fall back to fal's *temporary* URL rather than losing the generated image.
+7. Print the cover URL (warn if it's the temporary fallback). If generation itself fails,
+   print a plain message; the name + tracklist already shown stay intact.
 
 ## Tools it can use
 

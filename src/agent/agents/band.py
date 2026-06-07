@@ -9,6 +9,7 @@ This file holds only the *first* piece for now, so the text half can be tested f
 before any spend is wired in.
 """
 
+from loguru import logger
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 
@@ -69,15 +70,28 @@ def _cover_prompt(concept: BandConcept, vibe: str) -> str:
     )
 
 
-async def generate_cover(concept: BandConcept, vibe: str) -> str:
-    """Generate the album cover and return a durable (R2-persisted) URL.
+class Cover(BaseModel):
+    """A generated album cover. `persisted` is False when we fell back to fal's URL."""
+
+    url: str
+    persisted: bool  # True = durable R2 link; False = temporary fal URL (expires ~1h)
+
+
+async def generate_cover(concept: BandConcept, vibe: str) -> Cover:
+    """Generate the album cover and return its URL.
 
     Spends fal.ai money — call this ONLY after the user confirms (the gate in main.py).
-    Raises RuntimeError if the model returns no image so the caller can fail honestly.
+    Persisting to R2 gives a durable link; if that upload fails (e.g. R2 misconfigured),
+    we keep the freshly-generated image by falling back to fal's *temporary* URL rather
+    than throwing the result away. Raises RuntimeError only if no image was produced.
     """
-    result = await media.text_to_image(
-        _cover_prompt(concept, vibe), persist=True, prefix=COVER_PREFIX
-    )
+    result = await media.text_to_image(_cover_prompt(concept, vibe))  # no persist yet
     if not result.files:
         raise RuntimeError("The image model returned no image.")
-    return result.files[0].url
+    file = result.files[0]
+    try:
+        durable = await media.persist_file(file, prefix=COVER_PREFIX)
+        return Cover(url=durable.url, persisted=True)
+    except Exception as error:  # storage down/misconfigured — keep the temp URL we have
+        logger.warning("Couldn't persist cover to R2, using temporary fal URL: {}", error)
+        return Cover(url=file.url, persisted=False)

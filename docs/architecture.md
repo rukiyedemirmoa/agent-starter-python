@@ -11,7 +11,7 @@ runs every time, image runs only after the gate.
 | Module | Does one thing | Input → Output |
 |--------|----------------|----------------|
 | `imagine_band` (in `agents/band.py`) | invent the concept | `vibe: str` → `BandConcept` (name, 10 songs, style note) |
-| `generate_cover` (in `agents/band.py`) | make the album art | `BandConcept` + `vibe` → cover URL (persisted to R2) |
+| `generate_cover` (in `agents/band.py`) | make the album art | `BandConcept` + `vibe` → `Cover` (URL + whether it's persisted to R2 or a temp fallback) |
 | `main.py` (wiring + UX) | run the flow + the gate | user vibe → printed concept, then gated cover |
 
 `BandConcept` is a Pydantic model: `band_name: str`, `tracklist: list[str]` (validator:
