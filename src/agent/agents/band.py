@@ -12,9 +12,11 @@ before any spend is wired in.
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 
+from agent.services import media
 from agent.services.llm import build_model
 
 TRACK_COUNT = 10
+COVER_PREFIX = "bandnamer"  # namespaces our files in the shared R2 bucket
 
 
 class BandConcept(BaseModel):
@@ -55,3 +57,27 @@ async def imagine_band(vibe: str) -> BandConcept:
     prompt = vibe.strip() or "anything — surprise me with something distinctive"
     result = await band_agent.run(f"Vibe: {prompt}")
     return result.output
+
+
+def _cover_prompt(concept: BandConcept, vibe: str) -> str:
+    """Compose the image prompt from the concept's own art direction plus the vibe."""
+    return (
+        f"Album cover art for the band '{concept.band_name}'. "
+        f"{concept.style_note} "
+        f"Overall mood: {vibe.strip() or concept.band_name}. "
+        "Square, high detail, no extra text or watermarks beyond the band name."
+    )
+
+
+async def generate_cover(concept: BandConcept, vibe: str) -> str:
+    """Generate the album cover and return a durable (R2-persisted) URL.
+
+    Spends fal.ai money — call this ONLY after the user confirms (the gate in main.py).
+    Raises RuntimeError if the model returns no image so the caller can fail honestly.
+    """
+    result = await media.text_to_image(
+        _cover_prompt(concept, vibe), persist=True, prefix=COVER_PREFIX
+    )
+    if not result.files:
+        raise RuntimeError("The image model returned no image.")
+    return result.files[0].url

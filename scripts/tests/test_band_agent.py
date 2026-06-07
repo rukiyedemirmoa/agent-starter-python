@@ -56,6 +56,20 @@ def test_tracklist_must_be_exactly_ten(n: int) -> None:
         )
 
 
+def test_cover_prompt_includes_name_and_style() -> None:
+    from agent.agents.band import TRACK_COUNT, BandConcept, _cover_prompt
+
+    concept = BandConcept(
+        band_name="Hollow Meridian",
+        tracklist=[f"Track {i}" for i in range(TRACK_COUNT)],
+        style_note="Rain-slicked neon over an empty freeway.",
+    )
+    prompt = _cover_prompt(concept, "rainy 3am synthwave")
+    assert "Hollow Meridian" in prompt
+    assert "Rain-slicked neon" in prompt
+    assert "rainy 3am synthwave" in prompt
+
+
 # --- integration: a real concept from a real vibe ---------------------------
 
 
