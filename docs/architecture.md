@@ -12,7 +12,14 @@ runs every time, image runs only after the gate.
 |--------|----------------|----------------|
 | `imagine_band` (in `agents/band.py`) | invent the concept | `vibe: str` → `BandConcept` (name, 10 songs, style note) |
 | `generate_cover` (in `agents/band.py`) | make the album art | `BandConcept` + `vibe` → `Cover` (URL + whether it's persisted to R2 or a temp fallback) |
-| `main.py` (wiring + UX) | run the flow + the gate | user vibe → printed concept, then gated cover |
+| `main.py` (CLI wiring + UX) | run the flow + the gate | user vibe → printed concept, then gated cover |
+| `web.py` (web wiring + UX) | same flow over HTTP | vibe form → band + tracklist page; a **button** POSTs back to generate the cover (the gate) |
+
+Both `main.py` and `web.py` are thin UX layers over the *same* two modules. The web app
+is stateless: the band concept is round-tripped to the browser as a hidden field and
+POSTed back when the cover button is clicked, so no database is needed. A password gate
+(`APP_PASSWORD`) protects the deployed app, and cover generation lives on its own POST
+endpoint that only fires on the button — never on a page visit — so it can't auto-spend.
 
 `BandConcept` is a Pydantic model: `band_name: str`, `tracklist: list[str]` (validator:
 len == 10), `style_note: str`. The validator is what makes "exactly 10 songs" a guarantee

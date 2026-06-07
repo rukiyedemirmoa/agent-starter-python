@@ -1,0 +1,29 @@
+{# The band concept, swapped into #result after POST /band. Includes the gated cover
+   button: it round-trips the concept as a hidden JSON field (stateless — no DB). #}
+<div class="rounded-2xl border border-slate-800 bg-slate-900/50 p-6">
+  <h2 class="text-2xl font-bold text-fuchsia-300">{{ concept.band_name }}</h2>
+  <p class="mt-1 text-sm italic text-slate-400">{{ concept.style_note }}</p>
+
+  <ol class="mt-4 space-y-1 list-decimal list-inside text-slate-200">
+    {% for track in concept.tracklist %}
+    <li>{{ track }}</li>
+    {% endfor %}
+  </ol>
+
+  {# The ONLY money action. Fires on click only — never on page load. #}
+  <form hx-post="/band/cover" hx-target="#cover" hx-swap="innerHTML"
+        hx-indicator="#cover-spinner" hx-disabled-elt="find button"
+        class="mt-6">
+    <input type="hidden" name="concept" value="{{ concept_json }}">
+    <input type="hidden" name="vibe" value="{{ vibe }}">
+    <button type="submit"
+      class="rounded-xl bg-slate-700 px-4 py-2 font-semibold hover:bg-slate-600
+             transition disabled:opacity-50">
+      🖼 Generate album cover
+    </button>
+    <span class="ml-3 text-sm text-slate-500">(spends a little on fal.ai)</span>
+  </form>
+
+  <p id="cover-spinner" class="htmx-indicator mt-4 text-slate-400">🎨 Painting the cover…</p>
+  <div id="cover" class="mt-4"></div>
+</div>

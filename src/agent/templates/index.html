@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-3xl font-bold">🎸 Band Namer</h1>
+<p class="mt-2 text-slate-400">
+  Describe a vibe. I'll invent an original band, a 10-song tracklist, and — if you press
+  the button — an album cover.
+</p>
+
+<form hx-post="/band" hx-target="#result" hx-swap="innerHTML"
+      hx-indicator="#vibe-spinner" hx-disabled-elt="find button"
+      class="mt-6 space-y-3">
+  <textarea name="vibe" rows="2" required
+    class="w-full rounded-xl border border-slate-700 bg-slate-900 p-4 text-slate-100
+           placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500"
+    placeholder="e.g. rainy 3am synthwave for driving through an empty city"></textarea>
+  <button type="submit"
+    class="w-full rounded-xl bg-fuchsia-600 px-4 py-3 font-semibold hover:bg-fuchsia-500
+           transition disabled:opacity-50">
+    Imagine the band →
+  </button>
+</form>
+
+<p id="vibe-spinner" class="htmx-indicator mt-4 text-slate-400">🎶 Dreaming up a band…</p>
+<div id="result" class="mt-8"></div>
+{% endblock %}

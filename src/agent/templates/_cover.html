@@ -1,0 +1,8 @@
+{# The generated cover, swapped into #cover. #}
+<img src="{{ url }}" alt="album cover"
+     class="rounded-xl border border-slate-800 w-full max-w-md">
+{% if not persisted %}
+<p class="mt-2 text-sm text-yellow-400">
+  Note: this is a temporary link (expires ~1h) — R2 save failed.
+</p>
+{% endif %}

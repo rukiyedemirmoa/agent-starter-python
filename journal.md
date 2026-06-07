@@ -62,3 +62,20 @@ scene it went tall and tiled the composition. Pinned `aspect_ratio="1:1"` and ti
 the prompt against panels/stacking. Regenerated → clean 1024×1024 single image. Lesson:
 when a media model misbehaves, read its `llms.txt` before touching the prompt — the
 default parameters are often the real cause.
+
+## 2026-06-07 14:30 — Added a web UX over the same agent, kept cover gated
+Built `src/agent/web.py` (FastAPI + Jinja2 + HTMX + Tailwind via CDN) as a second thin
+UX over the *same* `imagine_band` / `generate_cover` modules — no agent logic duplicated.
+Decisions:
+- **Stateless** (chose this over a DB): the `BandConcept` is round-tripped to the browser
+  as a single hidden JSON field and POSTed back when the cover button is clicked. No Neon
+  table, no migration. Safe enough because the whole app is behind the password gate.
+- **Spend stays gated**: cover generation is its own POST endpoint (`/band/cover`) that
+  only fires on the button — never on a page visit. POST `/band` (the cheap LLM call) is
+  all a visit triggers. Copied the example's `password_gate` middleware (httponly cookie).
+- **Slow-call UX**: HTMX `hx-indicator` spinner + `hx-disabled-elt` on the buttons, rather
+  than the example's heavier background-job+polling — fine at 6s/15s latencies.
+Verified locally end-to-end (gate opened just for the test run): GET / renders the form,
+POST /band returns the band + tracklist with the hidden concept and NO fal call, and the
+stateless round-trip to /band/cover produced a real 1.7MB PNG. Pointed `railway.toml` at
+`fastapi run src/agent/web.py` (the Dockerfile default entrypoint). Next: deploy.

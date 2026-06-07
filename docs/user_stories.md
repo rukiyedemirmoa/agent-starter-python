@@ -15,6 +15,9 @@ after you confirm — an **album cover image**.
    that I stay in control of when money is spent.
 4. As someone who'll come back to this, I want the cover saved to a durable URL, so
    that the link still works tomorrow.
+5. As someone sharing this with friends, I want a simple web page where I type a vibe and
+   see the band + tracklist, with a button to generate the cover, so that no one needs the
+   terminal — and the cover only generates (and spends) when someone clicks the button.
 
 ## What "good" feels like
 
