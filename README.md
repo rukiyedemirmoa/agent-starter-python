@@ -1,21 +1,35 @@
-# Agent Starter (Python)
+# Band Namer — vibe → band concept
 
-An opinionated, batteries-included starter for building AI agents — from simple scripts to Telegram bots to small web apps. You clone it, point Claude Code at it, and build.
+Give it a *vibe* in a few words and it invents a band: an original name, a 10-song
+tracklist, and (on your say-so) an album cover.
 
-> **One clone = one project.** Starting a new agent? Clone a fresh copy.
+> Built on the agentic-engineering starter. One clone = one project.
 
 ---
 
-## ✏️ Your project
+## ✏️ The project
 
-> Replace this section with *your* goal (this is stage 2 of the method — see below).
-> Keep it to a few sentences a friend would understand.
+**What I'm building:** a CLI that turns a vibe (e.g. *"rainy 3am synthwave for driving
+through an empty city"*) into an original band name, a 10-song tracklist, and an
+optional album cover image.
 
-**What I'm building:** _(one sentence)_
+**Who it's for and why:** anyone with a band-name-shaped itch — a daydreaming musician
+or a tinkerer who wants a fully-formed musical concept to riff on, fast.
 
-**Who it's for and why:** _(a sentence or two)_
+**What "done" looks like:** type a vibe, get back a named band with a cohesive
+tracklist in seconds; then choose whether to spend on a cover. The cover step is gated
+behind an explicit confirm so it never spends my fal.ai budget by surprise.
 
-**What "done" looks like:** _(what can the user do that they couldn't before?)_
+### Try it
+
+```bash
+uv run agent "rainy 3am synthwave for driving through an empty city"
+uv run agent          # or run with no vibe and it'll prompt you
+```
+
+You'll see the band + tracklist immediately; it then asks before generating the cover
+(default **No**). Generating a cover needs `FAL_KEY` set; durable cover links also need
+R2 configured (otherwise you get a working but temporary link).
 
 ---
 
@@ -68,11 +82,11 @@ This starter is built around a specific way of working — think first, document
 ## Common commands
 
 ```bash
-uv run agent                  # run the example agent
+uv run agent "your vibe here" # invent a band from a vibe
 uv run agent-doctor           # check your setup
 uv run pytest                 # fast tests
 uv run pytest -m integration  # live tests (need credentials)
-uv run fastapi dev src/agent/web.py   # run the web app
+uv run fastapi dev src/agent/web.py   # run the web app (unused so far)
 ```
 
 ## Configuration
