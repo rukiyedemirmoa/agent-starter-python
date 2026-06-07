@@ -18,6 +18,7 @@ from agent.services.llm import build_model
 
 TRACK_COUNT = 10
 COVER_PREFIX = "bandnamer"  # namespaces our files in the shared R2 bucket
+COVER_ASPECT_RATIO = "1:1"  # force a square cover; "auto" let the model stack panels
 
 
 class BandConcept(BaseModel):
@@ -63,10 +64,12 @@ async def imagine_band(vibe: str) -> BandConcept:
 def _cover_prompt(concept: BandConcept, vibe: str) -> str:
     """Compose the image prompt from the concept's own art direction plus the vibe."""
     return (
-        f"Album cover art for the band '{concept.band_name}'. "
+        f"A single album cover for the band '{concept.band_name}'. "
         f"{concept.style_note} "
         f"Overall mood: {vibe.strip() or concept.band_name}. "
-        "Square, high detail, no extra text or watermarks beyond the band name."
+        "One cohesive full-bleed image filling the whole square frame — NOT split into "
+        "panels, NOT stacked, no repeated or mirrored halves, no grid, no borders. "
+        "High detail, no text or watermarks other than the band name."
     )
 
 
@@ -85,7 +88,9 @@ async def generate_cover(concept: BandConcept, vibe: str) -> Cover:
     we keep the freshly-generated image by falling back to fal's *temporary* URL rather
     than throwing the result away. Raises RuntimeError only if no image was produced.
     """
-    result = await media.text_to_image(_cover_prompt(concept, vibe))  # no persist yet
+    result = await media.text_to_image(  # no persist yet — we persist best-effort below
+        _cover_prompt(concept, vibe), aspect_ratio=COVER_ASPECT_RATIO
+    )
     if not result.files:
         raise RuntimeError("The image model returned no image.")
     file = result.files[0]
