@@ -79,3 +79,14 @@ Verified locally end-to-end (gate opened just for the test run): GET / renders t
 POST /band returns the band + tracklist with the hidden concept and NO fal call, and the
 stateless round-trip to /band/cover produced a real 1.7MB PNG. Pointed `railway.toml` at
 `fastapi run src/agent/web.py` (the Dockerfile default entrypoint). Next: deploy.
+
+## 2026-06-07 15:00 — Deployed to Railway
+Live at https://band-namer-production.up.railway.app. Drove it with the Railway CLI:
+`railway init` → `railway up --detach` → `railway variables --set` (OPENROUTER_API_KEY,
+FAL_KEY, APP_PASSWORD — the three required ones; R2 left out until its credential is
+fixed) → `railway domain`. The `$PORT` gotcha didn't bite — `fastapi run` read Railway's
+injected PORT and bound 0.0.0.0:8080 with no start-command flags, exactly as docs/deploy.md
+warns to rely on. Verified live: the password gate redirects `/` and `/band` to `/login`
+for unauthenticated requests (so strangers can't spend), and the authenticated happy path
+produced a band + 10 tracks with the cover button un-clicked (no fal spend on a visit).
+Note: covers on the deployed app are temporary links until R2 is fixed.
