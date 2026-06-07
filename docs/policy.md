@@ -2,31 +2,47 @@
 
 **Stage 4 — Describe the target agent behavior, step by step.**
 
-This is the agent's "rulebook" — how it should think and act. Most of it becomes the
-**system prompt** and the **control flow** in your code. Write it in plain language first.
+The rulebook. The *creative* part becomes the LLM system prompt; the *gate* part becomes
+control flow in `main.py` (it is code, not the model's choice).
 
 ## The agent's job, in one line
 
-_(e.g. "Help an ear-trained musician name what they're playing and read it back.")_
+Turn a vibe into an original band name + a 10-song tracklist, then — only on the user's
+say-so — an album cover.
 
 ## Step by step
 
-What does the agent do, in order, for a typical request?
-
-1. ___
-2. ___
-3. ___
+1. Read a **vibe** from the user (CLI arg, or a prompt if none given).
+2. Ask the LLM for a `BandConcept`: an original band name, exactly 10 song titles, and a
+   short visual style note (for the cover prompt later).
+3. Print the band name and the numbered tracklist.
+4. **Gate (code, not the model):** ask *"Generate the album cover? [y/N]"*.
+   - No / Enter → print nothing more, spend nothing, exit cleanly.
+   - Yes → continue.
+5. Build an image prompt from the band name + vibe + style note.
+6. Call `media.text_to_image(..., persist=True, prefix="bandnamer")`.
+7. Print the durable cover URL. On failure, print a plain message; the name + tracklist
+   already shown stay intact.
 
 ## Tools it can use
 
-_(Which services/tools, and *when* it's allowed to use each.)_
-- e.g. `research()` — when the user asks about current/real-world facts
-- e.g. `media.text_to_image()` — when a visual would help
+- **LLM** (`build_model` + a pydantic-ai `Agent`) — step 2, the only creative call. No web
+  research needed; this is invention, not fact-finding.
+- **`media.text_to_image()`** (fal) — step 6, and **only after** the step-4 confirmation.
+- **`storage`** (R2) — indirectly, via `persist=True`, to make the cover URL durable.
+- No `db` — nothing is persisted between runs yet.
 
 ## Tone & style
 
-_(How should it sound? Concise? Warm? Never preachy?)_
+The band concept should read like a real act with a point of view: an evocative,
+*original* name and song titles that clearly belong to the same record. Playful and
+confident, not generic ("Song 1", "The Journey"). No explanation or preamble in the
+output — just the goods.
 
 ## Rules & boundaries
 
-_(Pull the hard rules from `failure_modes.md`. What must it always / never do?)_
+- **Never call fal.ai before the user confirms** (the money rule).
+- Exactly **10** songs — enforced by a Pydantic validator, not just asked for.
+- The band name must be **original** — never a real, well-known act.
+- Always produce a concept, even for a vague or empty vibe — never interrogate the user.
+- On any fal error, fail honestly and keep the already-shown concept.
