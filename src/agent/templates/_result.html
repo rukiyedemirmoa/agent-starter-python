@@ -1,29 +1,36 @@
 {# The band concept, swapped into #result after POST /band. Includes the gated cover
    button: it round-trips the concept as a hidden JSON field (stateless — no DB). #}
-<div class="rounded-2xl border border-slate-800 bg-slate-900/50 p-6">
-  <h2 class="text-2xl font-bold text-fuchsia-300">{{ concept.band_name }}</h2>
-  <p class="mt-1 text-sm italic text-slate-400">{{ concept.style_note }}</p>
+<div class="rounded-2xl border-2 border-coffee/40 bg-sleeve/70 p-6 shadow-[4px_6px_0_rgba(92,67,38,0.18)]">
+  <div class="flex items-baseline gap-3">
+    <span class="font-display text-xs text-burnt">A-SIDE</span>
+    <span class="h-px flex-1 bg-coffee/30"></span>
+  </div>
 
-  <ol class="mt-4 space-y-1 list-decimal list-inside text-slate-200">
+  <h2 class="mt-2 font-display text-3xl leading-tight text-faded">{{ concept.band_name }}</h2>
+  <p class="mt-1 italic text-ink-soft">{{ concept.style_note }}</p>
+
+  <ol class="mt-5 space-y-1.5 list-decimal list-inside marker:font-display marker:text-burnt text-ink">
     {% for track in concept.tracklist %}
-    <li>{{ track }}</li>
+    <li class="pl-1">{{ track }}</li>
     {% endfor %}
   </ol>
 
   {# The ONLY money action. Fires on click only — never on page load. #}
   <form hx-post="/band/cover" hx-target="#cover" hx-swap="innerHTML"
         hx-indicator="#cover-spinner" hx-disabled-elt="find button"
-        class="mt-6">
+        class="mt-7">
     <input type="hidden" name="concept" value="{{ concept_json }}">
     <input type="hidden" name="vibe" value="{{ vibe }}">
     <button type="submit"
-      class="rounded-xl bg-slate-700 px-4 py-2 font-semibold hover:bg-slate-600
-             transition disabled:opacity-50">
+      class="btn-retro rounded-2xl bg-mustard px-5 py-2.5 font-display tracking-wide
+             text-coffee hover:bg-amber disabled:opacity-50 disabled:cursor-not-allowed">
       🖼 Generate album cover
     </button>
-    <span class="ml-3 text-sm text-slate-500">(spends a little on fal.ai)</span>
+    <span class="ml-3 text-sm italic text-ink-soft">(spends a little on fal.ai)</span>
   </form>
 
-  <p id="cover-spinner" class="htmx-indicator mt-4 text-slate-400">🎨 Painting the cover…</p>
+  <p id="cover-spinner" class="htmx-indicator mt-4 items-center gap-2 font-body italic text-coffee">
+    🎨 Painting the cover…
+  </p>
   <div id="cover" class="mt-4"></div>
 </div>

@@ -1,8 +1,14 @@
-{# The generated cover, swapped into #cover. #}
-<img src="{{ url }}" alt="album cover"
-     class="rounded-xl border border-slate-800 w-full max-w-md">
+{# The generated cover, swapped into #cover. Framed like a record sleeve. #}
+<figure class="w-full max-w-md rounded-xl border-2 border-coffee/50 bg-paper-2 p-3
+               shadow-[5px_7px_0_rgba(92,67,38,0.22)]">
+  <img src="{{ url }}" alt="album cover"
+       class="w-full rounded-lg border border-coffee/30">
+  <figcaption class="mt-2 text-center font-display text-[0.7rem] uppercase tracking-[0.25em] text-burnt">
+    33⅓ rpm · long play
+  </figcaption>
+</figure>
 {% if not persisted %}
-<p class="mt-2 text-sm text-yellow-400">
+<p class="mt-2 text-sm italic text-faded">
   Note: this is a temporary link (expires ~1h) — R2 save failed.
 </p>
 {% endif %}

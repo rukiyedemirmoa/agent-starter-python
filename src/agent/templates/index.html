@@ -1,25 +1,39 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="text-3xl font-bold">🎸 Band Namer</h1>
-<p class="mt-2 text-slate-400">
+<header class="flex items-center gap-5">
+  <div class="vinyl h-28 w-28 sm:h-32 sm:w-32 shrink-0 rounded-full shadow-lg ring-2 ring-coffee/30"></div>
+  <div>
+    <p class="font-body text-xs uppercase tracking-[0.3em] text-burnt">Now spinning</p>
+    <h1 class="font-display text-4xl leading-none text-coffee drop-shadow-[1px_2px_0_rgba(92,67,38,0.25)]">
+      Band&nbsp;Namer
+    </h1>
+  </div>
+</header>
+
+<p class="mt-5 text-lg leading-relaxed text-ink-soft">
   Describe a vibe. I'll invent an original band, a 10-song tracklist, and — if you press
   the button — an album cover.
 </p>
 
+<div class="mt-6 h-px bg-gradient-to-r from-transparent via-coffee/40 to-transparent"></div>
+
 <form hx-post="/band" hx-target="#result" hx-swap="innerHTML"
       hx-indicator="#vibe-spinner" hx-disabled-elt="find button"
-      class="mt-6 space-y-3">
+      class="mt-6 space-y-4">
   <textarea name="vibe" rows="2" required
-    class="w-full rounded-xl border border-slate-700 bg-slate-900 p-4 text-slate-100
-           placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500"
+    class="w-full rounded-2xl border-2 border-coffee/40 bg-paper-2 p-4 text-ink
+           shadow-inner placeholder:text-ink-soft/60
+           focus:outline-none focus:border-burnt focus:ring-2 focus:ring-amber/50"
     placeholder="e.g. rainy 3am synthwave for driving through an empty city"></textarea>
   <button type="submit"
-    class="w-full rounded-xl bg-fuchsia-600 px-4 py-3 font-semibold hover:bg-fuchsia-500
-           transition disabled:opacity-50">
-    Imagine the band →
+    class="btn-retro w-full rounded-2xl bg-burnt px-4 py-3 font-display text-lg tracking-wide
+           text-paper hover:bg-faded disabled:opacity-50 disabled:cursor-not-allowed">
+    Imagine the band&nbsp;→
   </button>
 </form>
 
-<p id="vibe-spinner" class="htmx-indicator mt-4 text-slate-400">🎶 Dreaming up a band…</p>
+<p id="vibe-spinner" class="htmx-indicator mt-4 items-center gap-2 font-body italic text-coffee">
+  🎶 Dreaming up a band…
+</p>
 <div id="result" class="mt-8"></div>
 {% endblock %}

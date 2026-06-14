@@ -1,16 +1,26 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="text-3xl font-bold">🔒 Protected</h1>
-<p class="mt-2 text-slate-400">Enter the password to continue.</p>
-<form method="post" action="/login" class="mt-6 space-y-3">
+<header class="flex items-center gap-5">
+  <div class="vinyl h-20 w-20 shrink-0 rounded-full shadow-lg ring-2 ring-coffee/30"></div>
+  <div>
+    <p class="font-body text-xs uppercase tracking-[0.3em] text-burnt">Members only</p>
+    <h1 class="font-display text-3xl leading-none text-coffee">Back&nbsp;Room</h1>
+  </div>
+</header>
+
+<p class="mt-4 text-ink-soft">Enter the password to step inside the record shop.</p>
+
+<form method="post" action="/login" class="mt-6 space-y-4">
   <input type="password" name="password" required autofocus
-    class="w-full rounded-xl border border-slate-700 bg-slate-900 p-4 text-slate-100
-           focus:outline-none focus:ring-2 focus:ring-fuchsia-500"
+    class="w-full rounded-2xl border-2 border-coffee/40 bg-paper-2 p-4 text-ink
+           shadow-inner placeholder:text-ink-soft/60
+           focus:outline-none focus:border-burnt focus:ring-2 focus:ring-amber/50"
     placeholder="password">
-  {% if error %}<p class="text-red-400">Wrong password — try again.</p>{% endif %}
+  {% if error %}<p class="italic text-faded">Wrong password — try again.</p>{% endif %}
   <button type="submit"
-    class="w-full rounded-xl bg-fuchsia-600 px-4 py-3 font-semibold hover:bg-fuchsia-500 transition">
-    Enter →
+    class="btn-retro w-full rounded-2xl bg-burnt px-4 py-3 font-display text-lg tracking-wide
+           text-paper hover:bg-faded">
+    Enter&nbsp;→
   </button>
 </form>
 {% endblock %}
