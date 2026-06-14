@@ -90,3 +90,30 @@ warns to rely on. Verified live: the password gate redirects `/` and `/band` to 
 for unauthenticated requests (so strangers can't spend), and the authenticated happy path
 produced a band + 10 tracks with the cover button un-clicked (no fal spend on a visit).
 Note: covers on the deployed app are temporary links until R2 is fixed.
+
+## 2026-06-14 13:49 — Restyled the web UI: retro record-shop theme
+Reskinned all six templates (base, index, login, _result, _cover, _error) from the dark
+slate / fuchsia look to a warm 1970s record-shop aesthetic. **Styling only** — every
+`hx-*` attribute, form name/id/action, the password gate, and the agent modules are
+untouched. Decisions:
+- **Theme lives in `base.html`** via a Tailwind v4 `@theme` block (aged cream, coffee
+  brown, mustard/amber, burnt orange, faded red as named utilities) so the palette is
+  defined once and reused, not sprinkled as ad-hoc hex across templates.
+- **Type**: Alfa Slab One (chunky display) + Bitter (warm slab body), loaded with one
+  Google Fonts `<link>`. Picked a slab display over a groovy script — reads as a record
+  sleeve without tipping into kitsch.
+- **Texture without assets**: page grain is an inline SVG `feTurbulence` data-URI plus a
+  soft amber/red vignette; the vinyl record is pure CSS (concentric grooves + spindle
+  hole). No image files to ship or host.
+- **Vertical balance**: `main` uses `my-auto` inside a `min-h-screen` flex column. Chose
+  this over `justify-center` deliberately — short pages center, but a tall band+cover
+  result collapses the auto-margins and scrolls normally instead of clipping the top.
+- **Record-sleeve panel** wraps the content block in `base.html`, so the framing applies
+  to full pages *and* every HTMX fragment swapped into them, consistently.
+After a first preview the user asked for three tweaks (done in a second pass): bigger and
+fully *static* vinyl (dropped the spin animation entirely — no `@keyframes`, no
+`prefers-reduced-motion` needed), the vertical centering above, and the sleeve panel.
+Verified locally end-to-end behind the gate (GET /login, POST /login, GET / all render
+the new markup; no spin classes remain). Lesson: keeping the theme as `@theme` variables
++ a wrapping panel in `base.html` made the second-pass tweaks a few small edits instead
+of a hunt-and-replace across six files.
